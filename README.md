@@ -1,6 +1,6 @@
 # Apache Projects Manager - APM
 
-Uma simples aplicação para praticar o shell script e também ajudar no desenvolvimento com Shell Script.
+Uma simples aplicação para praticar o shell script e também ajudar no desenvolvimento com Apache.
 
 ## Funcionalidades
 
