@@ -84,6 +84,8 @@ if [ $1 = "create" ]; then
     CustomLog \${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>" >$PROJECT_CONF_FILE
 
+    echo "Project \"$2\" successful created"
+
 elif [ $1 = "delete" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
