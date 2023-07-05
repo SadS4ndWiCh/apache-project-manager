@@ -64,7 +64,7 @@ fi
 if [ $1 = "create" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
-        echo "./apm.sh create <project name>"
+        echo "$0 create <project name>"
         exit
     fi
 
@@ -89,7 +89,7 @@ if [ $1 = "create" ]; then
 elif [ $1 = "delete" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
-        echo "./apm.sh delete <project name>"
+        echo "$0 delete <project name>"
         exit
     fi
 
@@ -133,7 +133,7 @@ elif [ $1 = "list" ]; then
 elif [ $1 = "start" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
-        echo "./apm.sh start <project name>"
+        echo "$0 start <project name>"
     fi
 
     if [ $(isprojectexists $2) -eq 0 ]; then
@@ -155,7 +155,7 @@ elif [ $1 = "start" ]; then
 elif [ $1 = "stop" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
-        echo "./apm.sh stop <project name>"
+        echo "$0 stop <project name>"
     fi
 
     if [ $(isprojectexists $2) -eq 0 ]; then
