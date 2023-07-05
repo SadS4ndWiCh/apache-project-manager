@@ -57,7 +57,14 @@ APACHE_SITES_DEFAULT_CONF="/etc/apache2/sites-available/000-default.conf"
 APACHE_PROJECT_ROOT="/var/www"
 
 if [ $# -eq 0 ]; then
-    echo "Invalid"
+    echo "Welcome to the Apache Project Manager (APM)"
+    echo
+    echo "Commands:"
+    echo "$0 create <project name>: Create a project with the given name"
+    echo "$0 delete <project name>: Delete a specific project."
+    echo "$0 list: List all available projects and your current status."
+    echo "$0 start <project name>: Start a specific project."
+    echo "$0 stop <project name>: Stop a specific project."
     exit
 fi
 
