@@ -1,60 +1,48 @@
 #!/bin/bash
 
+APACHE_SITES_ROOT="/etc/apache2/sites-available"
+APACHE_SITES_DEFAULT_CONF="/etc/apache2/sites-available/000-default.conf"
+APACHE_PROJECT_ROOT="/var/www"
+
 strcontains() {
-    TEXT=$1
-    STRING=$2
+    text=$1
+    string=$2
 
-    if [[ $TEXT == *"$STRING"* ]]; then
-        echo 1
-        exit
-    fi
-
-    echo 0
+    [[ $text == *"$string"* ]] && echo 1 || echo 0
 }
 
 issiterunning() {
-    SITE=$1
+    projectname=$1
 
-    echo $(strcontains "$(a2query -s 2>/dev/null)" "$SITE")
+    printf '%s\n' "$(strcontains "$(a2query -s 2>/dev/null)" "$projectname")"
 }
 
 isprojectexists() {
-    PROJECT_CONF_FILE="$APACHE_SITES_ROOT/$1.conf"
+    proj_conf_file_path="$APACHE_SITES_ROOT/$1.conf"
 
-    if [ -e $PROJECT_CONF_FILE ]; then
-        echo 1
-        exit
-    fi
-
-    echo 0
+    [[ -e $proj_conf_file_path ]] && echo 1 || echo 0
 }
 
 currentrunningproject() {
-    for PROJECT in $(ls $APACHE_SITES_ROOT); do
-        PROJECT_NAME=$(echo $PROJECT | sed 's/\.conf$//')
-
-        if [ $(issiterunning $PROJECT_NAME) -eq 1 ]; then
-            echo $PROJECT_NAME
+    for project in $APACHE_SITES_ROOT; do
+        if [ "$(issiterunning "$project")" -eq 1 ]; then
+            printf '%s\n' "$projectname"
             exit
         fi
     done
 }
 
 stopproject() {
-    PROJECT_NAME=$1
+    projectname=$1
 
-    sudo a2dissite "$PROJECT_NAME" -q
+    sudo a2dissite "$projectname" -q
 }
 
 startproject() {
-    PROJECT_NAME=$1
+    projectname=$1
 
-    sudo a2ensite "$PROJECT_NAME" -q
+    sudo a2ensite "$projectname" -q
 }
-
-APACHE_SITES_ROOT="/etc/apache2/sites-available"
-APACHE_SITES_DEFAULT_CONF="/etc/apache2/sites-available/000-default.conf"
-APACHE_PROJECT_ROOT="/var/www"
 
 if [ $# -eq 0 ]; then
     echo "Welcome to the Apache Project Manager (APM)"
@@ -68,7 +56,7 @@ if [ $# -eq 0 ]; then
     exit
 fi
 
-if [ $1 = "create" ]; then
+if [ "$1" = "create" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
         echo "$0 create <project name>"
@@ -78,29 +66,29 @@ if [ $1 = "create" ]; then
     PROJECT_FOLDER="$APACHE_PROJECT_ROOT/$2"
     PROJECT_CONF_FILE="$APACHE_SITES_ROOT/$2.conf"
 
-    sudo cp $APACHE_SITES_DEFAULT_CONF $PROJECT_CONF_FILE
-    sudo chown -R $USER:$USER $PROJECT_CONF_FILE
-    mkdir $PROJECT_FOLDER
+    sudo cp "$APACHE_SITES_DEFAULT_CONF" "$PROJECT_CONF_FILE"
+    sudo chown -R "$USER":"$USER" "$PROJECT_CONF_FILE"
+    mkdir "$PROJECT_FOLDER"
 
-    sudo echo "<VirtualHost *:80>
+    echo "<VirtualHost *:80>
     ServerName $2
     ServerAlias $2
 
     DocumentRoot $PROJECT_FOLDER
     ErrorLog \${APACHE_LOG_DIR}/error.log
     CustomLog \${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>" >$PROJECT_CONF_FILE
+</VirtualHost>" | sudo tee "$PROJECT_CONF_FILE" >/dev/null
 
     echo "Project \"$2\" successful created"
 
-elif [ $1 = "delete" ]; then
+elif [ "$1" = "delete" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
         echo "$0 delete <project name>"
         exit
     fi
 
-    if [ $(isprojectexists $2) -eq 0 ]; then
+    if [ "$(isprojectexists "$2")" -eq 0 ]; then
         echo "Does not exists \"$2\" project"
         exit
     fi
@@ -113,45 +101,46 @@ elif [ $1 = "delete" ]; then
 
     CURRENT_RUNNING_PROJECT=$(currentrunningproject)
 
-    if [ $CURRENT_RUNNING_PROJECT == $2 ]; then
-        stopproject $2 &>/dev/null
+    if [ "$CURRENT_RUNNING_PROJECT" == "$2" ]; then
+        stopproject "$2" &>/dev/null
     fi
 
     PROJECT_FOLDER="$APACHE_PROJECT_ROOT/$2"
     PROJECT_CONF_FILE="$APACHE_SITES_ROOT/$2.conf"
 
-    sudo rm -fr $PROJECT_FOLDER $PROJECT_CONF_FILE
+    sudo rm -fr "$PROJECT_FOLDER" "$PROJECT_CONF_FILE"
 
     echo "Project \"$2\" successful deleted"
 
-elif [ $1 = "list" ]; then
+elif [ "$1" = "list" ]; then
     echo "Projects:"
     echo
-    for PROJECT in $(ls $APACHE_SITES_ROOT); do
-        PROJECT_NAME=$(echo $PROJECT | sed 's/\.conf$//')
+    for project in "$APACHE_SITES_ROOT"/*.conf; do
+        filename=${project##*/}
+        projectname=${filename%%.*}
 
-        if [ $(issiterunning $PROJECT_NAME) -eq 1 ]; then
-            echo "$PROJECT_NAME: <RUNNING>"
+        if [ "$(issiterunning "$projectname")" -eq 1 ]; then
+            echo "$projectname: <RUNNING>"
         else
-            echo "$PROJECT_NAME"
+            echo "$projectname"
         fi
     done
 
-elif [ $1 = "start" ]; then
+elif [ "$1" = "start" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
         echo "$0 start <project name>"
     fi
 
-    if [ $(isprojectexists $2) -eq 0 ]; then
+    if [ "$(isprojectexists "$2")" -eq 0 ]; then
         echo "Does not exists \"$2\" project"
         exit
     fi
 
     CURRENT_RUNNING_PROJECT=$(currentrunningproject)
 
-    if [ -n $CURRENT_RUNNING_PROJECT ]; then
-        stopproject $CURRENT_RUNNING_PROJECT &>/dev/null
+    if [ -n "$CURRENT_RUNNING_PROJECT" ]; then
+        stopproject "$CURRENT_RUNNING_PROJECT" &>/dev/null
     fi
 
     startproject "$2" -q &>/dev/null
@@ -159,28 +148,28 @@ elif [ $1 = "start" ]; then
 
     echo "Project \"$2\" successful started"
 
-elif [ $1 = "stop" ]; then
+elif [ "$1" = "stop" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
         echo "$0 stop <project name>"
     fi
 
-    if [ $(isprojectexists $2) -eq 0 ]; then
+    if [ "$(isprojectexists "$2")" -eq 0 ]; then
         echo "Does not exists \"$2\" project"
         exit
     fi
 
     CURRENT_RUNNING_PROJECT=$(currentrunningproject)
 
-    if [ ! -n $CURRENT_RUNNING_PROJECT ]; then
+    if [ -z "$CURRENT_RUNNING_PROJECT" ]; then
         echo "No one project are running"
         exit
-    elif [ $CURRENT_RUNNING_PROJECT != $2 ]; then
+    elif [ "$CURRENT_RUNNING_PROJECT" != "$2" ]; then
         echo "Project \"$2\" isn't running"
         exit
     fi
 
-    stopproject $2 &>/dev/null
+    stopproject "$2" &>/dev/null
     sudo service apache2 restart
 
     echo "Project \"$2\" successful stoped"
