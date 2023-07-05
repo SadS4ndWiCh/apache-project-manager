@@ -184,4 +184,8 @@ elif [ $1 = "stop" ]; then
     sudo service apache2 restart
 
     echo "Project \"$2\" successful stoped"
+
+else
+    echo "The command \"$0 $*\" does not exists"
+
 fi
