@@ -44,6 +44,10 @@ startproject() {
     sudo a2ensite "$projectname" -q
 }
 
+restartapache() {
+    sudo service apache2 restart
+}
+
 if [ $# -eq 0 ]; then
     echo "Welcome to the Apache Project Manager (APM)"
     echo
@@ -53,6 +57,7 @@ if [ $# -eq 0 ]; then
     echo "$0 list: List all available projects and your current status."
     echo "$0 start <project name>: Start a specific project."
     echo "$0 stop <project name>: Stop a specific project."
+    echo "$0 restart: Restart the apache service."
     exit
 fi
 
@@ -144,7 +149,7 @@ elif [ "$1" = "start" ]; then
     fi
 
     startproject "$2" -q &>/dev/null
-    sudo service apache2 restart
+    restartapache
 
     echo "Project \"$2\" successful started"
 
@@ -170,9 +175,14 @@ elif [ "$1" = "stop" ]; then
     fi
 
     stopproject "$2" &>/dev/null
-    sudo service apache2 restart
+    restartapache
 
     echo "Project \"$2\" successful stoped"
+
+elif [ "$1" = "restart" ]; then
+    restartapache
+
+    echo "Apache successful restarted"
 
 else
     echo "The command \"$0 $*\" does not exists"
