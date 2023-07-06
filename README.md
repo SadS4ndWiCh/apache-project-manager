@@ -19,3 +19,7 @@ Com os comandos `./apm.sh start <nome do projeto>` e `./apm.sh stop <nome do pro
 ### Listar todos projetos
 
 Com o comando `./apm.sh list`, é listado todos os projetos e ver qual está rodando no momento.
+
+### Reiniciar o serviço do apache 
+
+Com o comando `./apm.sh restart`, o serviço do apache é reiniciado.
