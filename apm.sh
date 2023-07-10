@@ -52,19 +52,19 @@ if [ $# -eq 0 ]; then
     echo "Welcome to the Apache Project Manager (APM)"
     echo
     echo "Commands:"
-    echo "$0 create <project name>: Create a project with the given name"
-    echo "$0 delete <project name>: Delete a specific project."
-    echo "$0 list: List all available projects and your current status."
-    echo "$0 start <project name>: Start a specific project."
-    echo "$0 stop <project name>: Stop a specific project."
-    echo "$0 restart: Restart the apache service."
+    echo "create <project name>: Create a project with the given name"
+    echo "delete <project name>: Delete a specific project."
+    echo "list: List all available projects and your current status."
+    echo "start <project name>: Start a specific project."
+    echo "stop <project name>: Stop a specific project."
+    echo "restart: Restart the apache service."
     exit
 fi
 
 if [ "$1" = "create" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
-        echo "$0 create <project name>"
+        echo "create <project name>"
         exit
     fi
 
@@ -89,7 +89,7 @@ if [ "$1" = "create" ]; then
 elif [ "$1" = "delete" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
-        echo "$0 delete <project name>"
+        echo "delete <project name>"
         exit
     fi
 
@@ -134,7 +134,7 @@ elif [ "$1" = "list" ]; then
 elif [ "$1" = "start" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
-        echo "$0 start <project name>"
+        echo "start <project name>"
     fi
 
     if [ "$(isprojectexists "$2")" -eq 0 ]; then
@@ -156,7 +156,7 @@ elif [ "$1" = "start" ]; then
 elif [ "$1" = "stop" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
-        echo "$0 stop <project name>"
+        echo "stop <project name>"
     fi
 
     if [ "$(isprojectexists "$2")" -eq 0 ]; then
@@ -185,6 +185,6 @@ elif [ "$1" = "restart" ]; then
     echo "Apache successful restarted"
 
 else
-    echo "The command \"$0 $*\" does not exists"
+    echo "The command \"$*\" does not exists"
 
 fi
