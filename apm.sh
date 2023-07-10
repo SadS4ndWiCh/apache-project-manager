@@ -135,6 +135,7 @@ elif [ "$1" = "start" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
         echo "start <project name>"
+        exit
     fi
 
     if [ "$(isprojectexists "$2")" -eq 0 ]; then
@@ -157,6 +158,7 @@ elif [ "$1" = "stop" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
         echo "stop <project name>"
+        exit
     fi
 
     if [ "$(isprojectexists "$2")" -eq 0 ]; then
