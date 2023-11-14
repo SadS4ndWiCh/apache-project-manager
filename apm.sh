@@ -166,7 +166,6 @@ elif [ "$1" = "stop" ]; then
     fi
 
     CURRENT_RUNNING_PROJECT=$(currentrunningproject)
-    echo "$CURRENT_RUNNING_PROJECT"
 
     if [ -z "$CURRENT_RUNNING_PROJECT" ]; then
         echo "No one project are running"
