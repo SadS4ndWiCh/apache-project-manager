@@ -4,17 +4,19 @@ APACHE_SITES_ROOT="/etc/apache2/sites-available"
 APACHE_SITES_DEFAULT_CONF="/etc/apache2/sites-available/000-default.conf"
 APACHE_PROJECT_ROOT="/var/www"
 
-strcontains() {
-    text=$1
-    string=$2
-
-    [[ $text == *"$string"* ]] && echo 1 || echo 0
+startswith() {
+    case "$1" in
+    "$2"*)
+        echo 1
+        ;;
+    *)
+        echo 0
+        ;;
+    esac
 }
 
 issiterunning() {
-    projectname=$1
-
-    printf '%s\n' "$(strcontains "$(a2query -s 2>/dev/null)" "$projectname")"
+    printf '%s\n' "$(startswith "$(a2query -s 2>/dev/null)" "$1")"
 }
 
 isprojectexists() {
@@ -24,24 +26,23 @@ isprojectexists() {
 }
 
 currentrunningproject() {
-    for project in $APACHE_SITES_ROOT; do
-        if [ "$(issiterunning "$project")" -eq 1 ]; then
-            printf '%s\n' "$projectname"
+    for project in "$APACHE_SITES_ROOT"/*; do
+        filename=${project##*/}
+        projectname=${filename%%.*}
+
+        if [ "$(issiterunning "$projectname")" -eq 1 ]; then
+            echo "$projectname"
             exit
         fi
     done
 }
 
 stopproject() {
-    projectname=$1
-
-    sudo a2dissite "$projectname" -q
+    sudo a2dissite "$1" -q
 }
 
 startproject() {
-    projectname=$1
-
-    sudo a2ensite "$projectname" -q
+    sudo a2ensite "$1" -q
 }
 
 restartapache() {
@@ -58,10 +59,8 @@ if [ $# -eq 0 ]; then
     echo "start <project name>: Start a specific project."
     echo "stop <project name>: Stop a specific project."
     echo "restart: Restart the apache service."
-    exit
-fi
 
-if [ "$1" = "create" ]; then
+elif [ "$1" = "create" ]; then
     if [ $# -eq 1 ]; then
         echo "Valid command:"
         echo "create <project name>"
@@ -167,6 +166,7 @@ elif [ "$1" = "stop" ]; then
     fi
 
     CURRENT_RUNNING_PROJECT=$(currentrunningproject)
+    echo "$CURRENT_RUNNING_PROJECT"
 
     if [ -z "$CURRENT_RUNNING_PROJECT" ]; then
         echo "No one project are running"
